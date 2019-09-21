@@ -25,6 +25,6 @@ Sometimes we need to send large batch of messages in WhatsApp, but the contacts 
 
 
 ## Dependencies
-eel
-openpyxl
-selenium
+-eel
+-openpyxl
+-selenium
