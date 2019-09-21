@@ -25,6 +25,7 @@ Sometimes we need to send large batch of messages in WhatsApp, but the contacts 
 
 
 ## Dependencies
+Python packages used in this project:
 -eel
 -openpyxl
 -selenium
