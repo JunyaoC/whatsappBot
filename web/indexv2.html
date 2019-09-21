@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>WhatsApp Bot</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.5/css/bulma.min.css">
+	<script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
+	<script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
+	<script
+	  src="https://code.jquery.com/jquery-3.4.1.js"
+	  integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU="
+	  crossorigin="anonymous"></script>
+	  <script type="text/javascript" src="/eel.js"></script>
+	  <link rel="stylesheet" type="text/css" href="css/core.css">
+</head>
+</head>
+<body>
+
+	<div class="navBar">
+		<div style="flex-grow: 1;display: flex;justify-content: flex-start;padding-left: 2rem;">
+			<div style="margin-right: 1rem;">
+				<button class="button is-rounded is-success" id="runTask">Run</button>
+			</div>
+			<button class="button is-rounded is-warning" id="restart">Restart</button>
+		</div>
+		<div style="flex-grow: 1;display: flex;align-items: center;">
+			<p style="color: white;">Delay: </p>
+			<div style="margin-left: 0.5rem;">
+				<input type="text" name="" value="6" style="text-align: center;" id="delayTime">
+			</div>
+		</div>
+		<div style="flex-grow: 1;display: flex;justify-content: space-around;align-items: center;">
+			<p style="color: white;">Load variable as contact:</p>
+			<div class="select" id="contactSelect">
+					<select id="varSelect">
+						<option>No Variable</option>
+					</select>
+			</div>
+		</div>
+	</div>
+
+	<div class="mainWrapper">
+
+		<div class="rightDiv">
+			<div class="spreadsheetDiv">
+				<div class="spreadsheetData">
+					<div style="display: flex;justify-content: flex-start;padding: 0.5rem 1rem 0.5rem 1rem;align-items: center;background-color: black;">
+						<h1 class="loadText">Spreadsheet</h1>
+						<div style="width: 30%;min-width:150px;max-width:150px;display: flex;justify-content: center;align-items: center;">
+							<button class="button is-rounded is-small" id="openDialog">Load</button>
+						</div>
+						<div style="width: 40%;max-width:150px;min-width:150px;display: flex;justify-content:center;align-items: center;color: white;">
+							<div style="margin: 0 1rem 0 0 ;font-size: 2rem;">
+								<i id="fontReduce" class="fas fa-sort-down"></i>
+							</div>
+							<div style="display: flex;justify-content: center;flex-direction: column;">
+								<p>Text Size</p>
+							</div>
+							<div style="margin: 0 0 0 1rem;font-size: 2rem;">
+								<i id="fontIncrease" class="fas fa-sort-up"></i>
+							</div>
+
+						</div>
+					</div>
+					<div style="overflow-y: scroll; height:80vh;background: transparent;">
+						<table class="table" id="varTable"></table>					
+					</div>
+				</div>
+			</div>	
+			
+		</div>
+
+		<div class="leftDiv">
+			<div class="logMainDiv">
+			<div class="titleBar" style="display: flex;justify-content: space-between;width: 100%;">
+					<h1 class="is-size-5 has-text-left">Logs</h1>
+					<div style="display: flex;flex-direction: column; justify-content: center;align-items: center;padding-right: 1rem;" id="clearLog">
+						<div style="margin: 0 0.2rem 0 0.2rem;">
+							<i class="fas fa-trash"></i>
+						</div>
+						<p style="font-size: 0.6rem;">CLEAR</p>
+						</div>
+
+				</div>
+				<div class="logDiv" style="overflow-y: scroll;height: 54vh;"></div>
+				
+			</div>
+			<div class="messageDiv">
+				<div class="titleBar" style="display: flex;justify-content: space-between;width: 100%;">
+					<h1 class="is-size-5 has-text-left">Message</h1>
+					<div style="display: flex;flex-direction: column; justify-content: center;align-items: center;padding-right: 1rem;" id="previewMessage">
+						<div style="margin: 0 0.2rem 0 0.2rem;">
+							<i class="fas fa-eye"></i>
+						</div>
+						<p style="font-size: 0.6rem;">PREVIEW</p>
+						</div>
+
+				</div>
+				<div id="textDiv" class="messageDivInner" style="height: 100%;">
+					<textarea id="textarea"></textarea>
+				</div>
+			</div>
+			
+		</div>
+
+
+
+
+
+	</div>
+
+	<script type="text/javascript">
+
+		var rowNum = 0;
+		var colNum = 0;
+		var currentRow;
+		var currentRem = 0.7;
+		
+		$(document).ready(function(){
+
+			$('#selectFile').on('change',function(e){
+				var fileName = e.target.files[0].name;
+				$('.file-name').text(fileName);
+
+				eel.importFile(fileName);
+
+			})
+
+			$('#openDialog').on('click',function(){
+				eel.openFileDialog();
+			})
+
+			$('#previewMessage').on('click',function(){
+
+				var rawText = $('#textarea').val();
+				eel.getCellValue(rawText)(returnCellValue);
+
+			})
+
+			$('#clearLog').on('click',function(){
+				$('.logDiv').empty();
+			})
+
+			$("#runTask").on('click',function(){
+				var contactVar = $('#contactSelect').find(":selected").text();
+				var msg = $('#textarea').val();
+				var delayTime = $('#delayTime').val();
+				eel.startTask(contactVar,msg,delayTime);
+			})
+
+
+			///decorative
+
+			$("#fontReduce").on('click',function(){
+				currentRem = currentRem - 0.1;
+				$('.table').css('font-size', currentRem + 'rem' );
+				$('.table th').css('font-size', currentRem + 'rem' );
+
+			})
+
+			$("#fontIncrease").on('click',function(){
+				currentRem = currentRem + 0.1;
+				$('.table').css('font-size', currentRem + 'rem' );
+				$('.table th').css('font-size', currentRem + 'rem' );
+
+			})
+
+			$("#restart").on('click',function(){
+				window.location.reload();
+			})
+
+		})
+
+		eel.expose(createTable);
+		eel.expose(insertValue);
+		eel.expose(returnTaskLog);
+
+		function returnCellValue(n) {
+			var newLog = document.createElement("P");
+			newLog.className = "logText";
+			newLog.innerHTML ="preview: <br>" + n;
+			$('.logDiv').append(newLog);
+		}
+
+		function returnTaskLog(n) {
+			var newLog = document.createElement("P");
+			newLog.className = "logText";
+			newLog.innerHTML =n;
+			$('.logDiv').append(newLog);
+		}
+
+		function createTable(tableId, _rowNum, _colNum) {
+			var tableRef = $('#' + tableId );
+			rowNum = _rowNum;
+			colNum = _colNum;
+
+			$(tableRef).empty();
+			$('#varSelect').empty();
+
+			for(var i=0;i<_colNum;i++){
+				var newHeader = document.createElement("TH");
+				newHeader.innerHTML = "var" + (i+1);
+				$(tableRef).append(newHeader);
+
+				var newOption = document.createElement("OPTION");
+				newOption.innerHTML = "var" + (i+1);
+				$('#varSelect').append(newOption);
+			}
+		}
+
+		function insertValue(tableId,_cellNum,_cellVal) {
+			var tableRef = document.getElementById(tableId);
+
+			console.log(_cellNum)
+			
+			if(_cellNum == 0){
+				currentRow = tableRef.insertRow(-1);
+				var newCell = currentRow.insertCell(-1);
+				newCell.innerHTML = _cellVal;
+			} else{
+				var newCell = currentRow.insertCell(_cellNum);
+				newCell.innerHTML = _cellVal;
+			}
+
+		}
+
+
+	</script>
+
+
+
+</body>
+</html>
